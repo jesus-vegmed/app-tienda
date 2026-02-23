@@ -1,0 +1,56 @@
+services:
+  # ==========================================
+  # Base de datos PostgreSQL
+  # ==========================================
+  db:
+    image: postgres:16-alpine
+    container_name: tienda_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tienda_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: tienda_secret_2024
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./migrations/001_initial.sql:/docker-entrypoint-initdb.d/001_initial.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tienda_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ==========================================
+  # Backend API (Node.js + Express)
+  # ==========================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tienda_api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: tienda_db
+      DB_USER: postgres
+      DB_PASSWORD: tienda_secret_2024
+      JWT_SECRET: jwt_super_secreto_tienda_2024
+      JWT_EXPIRES_IN: 7d
+      PORT: 3000
+      NODE_ENV: production
+      UPLOAD_DIR: /app/uploads
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads:/app/uploads
+
+volumes:
+  pgdata:
+    driver: local
+  uploads:
+    driver: local

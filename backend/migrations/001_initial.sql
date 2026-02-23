@@ -155,5 +155,5 @@ CREATE INDEX IF NOT EXISTS idx_sync_log_table ON sync_log(table_name, record_id)
 -- Hash bcrypt de 'admin123'
 -- ============================================
 INSERT INTO users (username, password_hash, role)
-VALUES ('admin', '$2b$10$8K1p/I0VZ5YO7sGTfGqVgOCQZqR9fKqKzMq9FJ5c6EKjY1Af6FWXK', 'admin')
+VALUES ('admin', '$2b$10$IQwQfLdzAaW5RZeCbYtThuka3tYeMQeFls9Org6Cz8B8vXZeYIcPS', 'admin')
 ON CONFLICT (username) DO NOTHING;
